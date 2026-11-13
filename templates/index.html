@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodFlow AI – Autonomous Food Delivery Supply Chain</title>
+    <meta name="description" content="FoodFlow AI – Agentic AI-Based Food Delivery Supply Chain Management System. Demonstrates multi-agent autonomous decision-making.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════════ -->
+    <aside class="sidebar">
+        <div class="brand-container">
+            <div class="brand-icon">🍲</div>
+            <div class="brand-title">FOODFLOW AI</div>
+        </div>
+        <div class="brand-sub">Agentic Supply Chain System</div>
+
+        <div class="engine-card">
+            <div class="engine-label">AI Engine</div>
+            <div class="engine-status">
+                <span class="pulse-dot"></span>
+                <span id="engine-mode-display">🟡 Loading...</span>
+            </div>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item active"   onclick="switchTab('dashboard', this)"><span>📊</span> Dashboard</li>
+            <li class="nav-item"          onclick="switchTab('create-order', this)"><span>⚡</span> Create Order</li>
+            <li class="nav-item" id="nav-pipeline" onclick="switchTab('pipeline', this)"><span>🤖</span> AI Pipeline</li>
+            <li class="nav-item"          onclick="switchTab('inventory', this)"><span>📦</span> Inventory</li>
+            <li class="nav-item"          onclick="switchTab('suppliers', this)"><span>🛒</span> Suppliers</li>
+            <li class="nav-item"          onclick="switchTab('orders', this)"><span>📋</span> Orders</li>
+        </ul>
+    </aside>
+
+    <!-- ═══════════════════════════ MAIN ══════════════════════════════════ -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div style="font-weight:700;font-size:1.1rem;color:var(--text-primary);">FoodFlow AI System</div>
+            <div class="top-actions">
+                <div id="live-clock" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;">--:--:--</div>
+                <button class="quick-sim-btn" onclick="quickDemo()">⚡ Quick Demo</button>
+            </div>
+        </header>
+
+        <main class="content-area">
+
+            <!-- ─────────── SCREEN 1: DASHBOARD ─────────── -->
+            <section id="page-dashboard" class="page-view">
+                <div class="page-header">
+                    <h1 class="page-title">FoodFlow AI Dashboard</h1>
+                    <p class="page-sub">Real-time autonomous food supply chain monitoring</p>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-top"><span class="kpi-label">Orders Today</span><span class="kpi-icon-avatar">📦</span></div>
+                        <div class="kpi-val" id="kpi-orders">32</div>
+                        <div class="kpi-subtext">↗ +18% today</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top"><span class="kpi-label">Pending Orders</span><span class="kpi-icon-avatar">⏳</span></div>
+                        <div class="kpi-val" id="kpi-pending">5</div>
+                        <div class="kpi-subtext" style="color:var(--warning)">Need processing</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top"><span class="kpi-label">Low Stock Items</span><span class="kpi-icon-avatar">⚠️</span></div>
+                        <div class="kpi-val" id="kpi-lowstock" style="color:var(--danger)">3</div>
+                        <div class="kpi-subtext" style="color:var(--danger)">Require attention</div>
+                    </div>
+                    <div class="kpi-card" style="padding-bottom:0.5rem;">
+                        <div class="kpi-top"><span class="kpi-label">AI Agent Actions</span><span class="kpi-icon-avatar">🤖</span></div>
+                        <div class="kpi-val" id="kpi-aiactions">24</div>
+                        <div class="kpi-subtext" id="kpi-ai-breakdown" style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; white-space:pre-wrap; margin-top:0.4rem; line-height:1.4; color:var(--text-secondary);">
+                            Autonomous decisions
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem;">
+                    <div class="chart-card">
+                        <h3 class="chart-title" style="margin-bottom:1.2rem;">AI Supply Chain Status</h3>
+                        <div style="display:flex;flex-direction:column;gap:0.9rem;">
+                            <div class="status-row"><span>ORDER PROCESSING</span><span class="badge badge-normal">🟢 NORMAL</span></div>
+                            <div class="status-row"><span>INVENTORY</span><span class="badge badge-warning" id="db-inv-status">🟡 CHECKING...</span></div>
+                            <div class="status-row"><span>PROCUREMENT</span><span class="badge badge-normal">🟢 READY</span></div>
+                            <div class="status-row"><span>DELIVERY</span><span class="badge badge-normal">🟢 8 RIDERS ACTIVE</span></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3 class="chart-title" style="margin-bottom:1.2rem;">Recent AI Activity</h3>
+                        <div id="activity-feed" style="display:flex;flex-direction:column;gap:0.8rem;max-height:300px;overflow-y:auto;padding-right:0.5rem;">
+                            <!-- Activity feed injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─────────── SCREEN 2: CREATE ORDER ─────────── -->
+            <section id="page-create-order" class="page-view hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Create New Order</h1>
+                    <p class="page-sub">Submit an order — the 4-agent AI workflow will process it autonomously</p>
+                </div>
+
+                <div style="max-width:580px;margin:0 auto;">
+                    <div class="chart-card">
+                        <form id="orderForm" onsubmit="submitOrder(event)">
+                            <div class="form-group">
+                                <label class="form-label">Customer Name</label>
+                                <input id="f-cust" type="text" class="form-control" value="Aritra" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Food Item</label>
+                                <select id="f-food" class="form-control" required>
+                                    <option value="Chicken Biryani" selected>Chicken Biryani</option>
+                                    <option value="Chicken Roll">Chicken Roll</option>
+                                    <option value="Veg Biryani">Veg Biryani</option>
+                                    <option value="Paneer Butter Masala">Paneer Butter Masala</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quantity</label>
+                                <input id="f-qty" type="number" class="form-control" value="10" min="1" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delivery Location</label>
+                                <input id="f-loc" type="text" class="form-control" value="New Town" required>
+                            </div>
+
+                            <!-- Ingredient preview -->
+                            <div id="ingredient-preview" class="ingredient-preview">
+                                <div style="font-size:0.8rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;margin-bottom:0.6rem;">
+                                    📐 Estimated Ingredient Requirements
+                                </div>
+                                <div id="ingredient-list" style="font-size:0.88rem;color:var(--text-secondary);line-height:1.8;font-family:'JetBrains Mono',monospace;"></div>
+                            </div>
+
+                            <button type="submit" id="submitBtn" class="btn btn-primary" style="width:100%;padding:1rem;font-size:1.1rem;margin-top:1.2rem;">
+                                ⚡ PROCESS WITH AI
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─────────── SCREEN 3: AI PIPELINE ─────────── -->
+            <section id="page-pipeline" class="page-view hidden">
+                <div class="page-header">
+                    <h1 class="page-title" id="pipeline-title">🤖 AI Agent Pipeline</h1>
+                    <p class="page-sub">Watch the 4-agent autonomous decision workflow in real-time</p>
+                </div>
+
+                <!-- Overall progress bar -->
+                <div class="chart-card" style="margin-bottom:1.5rem;" id="progress-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+                        <h3 id="progress-label" style="color:var(--primary);">Initialising Agents...</h3>
+                        <span class="badge badge-warning" id="progress-badge">PROCESSING</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-bar" style="width:0%;"></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;font-family:'JetBrains Mono',monospace;">
+                        <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                    </div>
+                </div>
+
+                <!-- Agent step cards rendered here -->
+                <div id="pipeline-steps" style="display:flex;flex-direction:column;gap:1.2rem;"></div>
+
+                <!-- ─── FINAL AI DECISION CARD ─── -->
+                <div id="final-card" class="chart-card hidden" style="margin-top:2rem;border:2px solid var(--success);">
+                    <h2 style="color:var(--success);margin-bottom:1.5rem;text-align:center;">🤖 AI DECISION COMPLETE</h2>
+
+                    <div id="final-order-banner" style="background:rgba(0,0,0,0.4);padding:1.2rem;border-radius:12px;margin-bottom:1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.92rem;line-height:1.9;">
+                        <div style="color:var(--primary);font-weight:700;border-bottom:1px solid var(--border);padding-bottom:0.5rem;margin-bottom:0.8rem;" id="dec-order-title">
+                            ORDER #— SUMMARY:
+                        </div>
+                        <div id="dec-steps-list"></div>
+                    </div>
+
+                    <div style="text-align:center;margin-bottom:1.2rem;">
+                        <button class="btn btn-secondary" onclick="toggleReasoning()" style="font-size:0.95rem;">
+                            🧠 Why did AI make this decision?
+                        </button>
+                    </div>
+
+                    <div id="reasoning-drawer" class="hidden" style="background:#020617;padding:1.2rem;border-radius:8px;border-left:4px solid var(--primary);margin-bottom:1.5rem;">
+                        <h4 style="color:var(--primary);margin-bottom:0.6rem;">OBSERVE → REASON → DECIDE → ACT → VERIFY</h4>
+                        <ol id="reasoning-steps" style="color:var(--text-secondary);font-size:0.9rem;line-height:1.8;padding-left:1.2rem;"></ol>
+                        <div id="reasoning-conclusion" style="margin-top:0.8rem;font-weight:700;color:var(--success);"></div>
+                    </div>
+
+                    <!-- Procurement Decision Table (shown only if procurement happened) -->
+                    <div id="procurement-table-wrap" class="hidden" style="margin-bottom:1.5rem;">
+                        <h4 style="color:var(--primary);margin-bottom:0.8rem;">🛒 Supplier Comparison (AI Multi-Criteria Scoring)</h4>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr><th>Supplier</th><th>Price/kg</th><th>Delivery</th><th>Reliability</th><th>AI Decision</th></tr>
+                                </thead>
+                                <tbody id="procurement-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center;">
+                        <span class="badge badge-normal" style="font-size:1.1rem;padding:0.65rem 2rem;">🟢 ORDER PROCESSED AUTONOMOUSLY</span>
+                    </div>
+                </div>
+            </section>
+
+                       <!-- ─────────── SCREEN 4: INVENTORY ─────────── -->
+            <section id="page-inventory" class="page-view hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Inventory Management</h1>
+                    <p class="page-sub">Current raw ingredient stock levels vs minimum reorder thresholds</p>
+                </div>
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ingredient</th>
+                                    <th>Current</th>
+                                    <th>Reserved</th>
+                                    <th>Incoming</th>
+                                    <th>Available</th>
+                                    <th>Min Level</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inv-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="chart-card" style="margin-top:1.5rem;">
+                    <h3 style="color:var(--danger);margin-bottom:0.8rem;">⚠️ AI Inventory Alert</h3>
+                    <div id="inv-alert-box" style="background:#020617;padding:1.2rem;border-radius:8px;border-left:4px solid var(--danger);">
+                        <div style="color:var(--text-muted);font-size:0.9rem;">Loading inventory alerts...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─────────── SCREEN 5: SUPPLIERS ─────────── -->
+            <section id="page-suppliers" class="page-view hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Supplier Directory</h1>
+                    <p class="page-sub">Vendor list used by the Procurement Agent for multi-criteria scoring</p>
+                </div>
+                <div class="table-card" style="margin-bottom:1.5rem;">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>Supplier</th><th>Ingredient</th><th>Price / Unit</th><th>Delivery Time</th><th>Reliability</th></tr>
+                            </thead>
+                            <tbody id="sup-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 style="color:var(--primary);margin-bottom:0.8rem;">🤖 AI Procurement Scoring</h3>
+                    <div style="background:#020617;padding:1.4rem;border-radius:8px;border-left:4px solid var(--success);">
+                        <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">AI Multi-Criteria Score Formula</div>
+                        <div style="font-family:'JetBrains Mono',monospace;font-size:0.88rem;color:var(--text-secondary);margin-top:0.6rem;line-height:1.7;">
+                            Score = (Reliability × 0.40) + (Speed × 0.35) + (Price × 0.25)<br>
+                            Where Speed = 1 − (delivery_hrs / max_hrs), Price = 1 − (price / max_price)
+                        </div>
+                        <div style="margin-top:0.8rem;font-size:0.9rem;color:var(--text-secondary);">
+                            <b style="color:var(--success);">Typical Winner:</b> Express Farm Direct — 1 hr delivery, 94% reliability, ₹210/kg
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─────────── SCREEN 6: ORDERS ─────────── -->
+            <section id="page-orders" class="page-view hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Order History</h1>
+                    <p class="page-sub">All customer orders and their AI processing statuses</p>
+                </div>
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr><th>Order #</th><th>Customer</th><th>Product</th><th>Qty</th><th>Status</th><th>AI Status</th></tr>
+                            </thead>
+                            <tbody id="ord-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
